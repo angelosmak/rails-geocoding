@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @beach %>
+
+<div>
+  <%= link_to "Edit this beach", edit_beach_path(@beach) %> |
+  <%= link_to "Back to beaches", beaches_path %>
+
+  <%= button_to "Destroy this beach", @beach, method: :delete %>
+</div>

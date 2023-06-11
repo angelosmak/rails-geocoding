@@ -1,0 +1,14 @@
+<p style="color: green"><%= notice %></p>
+
+<h1>Beaches</h1>
+
+<div id="beaches">
+  <% @beaches.each do |beach| %>
+    <%= render beach %>
+    <p>
+      <%= link_to "Show this beach", beach %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New beach", new_beach_path %>
