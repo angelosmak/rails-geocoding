@@ -1,14 +1,49 @@
-<p style="color: green"><%= notice %></p>
+<div class="container text-center">
+  <p style="color: green"><%= notice %></p>
 
-<h1>Beaches</h1>
+  <h1>Beaches</h1>
 
-<div id="beaches">
-  <% @beaches.each do |beach| %>
-    <%= render beach %>
-    <p>
-      <%= link_to "Show this beach", beach %>
-    </p>
-  <% end %>
+  <div  id="beaches">
+  <div class="row row-cols-3 ">
+    <% @beaches.each do |beach| %>
+    <div class="card mb-2 mx-5 col-3 justify-content-center">
+      <%= render beach  %>
+      <p>
+        <%= link_to "Show this beach", beach ,class:"btn btn-primary"%>
+      </p>
+      </div>
+    <% end %>
+    </div>
+  </div>
+
+  <div >
+    <%= form_with url: nearby_beaches_path, method: :get do |form| %>
+      <%= form.text_field :location, placeholder: 'Enter your location' %>
+      <%= form.submit 'Search' %>
+    <% end %>
+  </div>
+
+  <%= link_to "New beach", new_beach_path,class:"btn btn-outline-primary my-3" %>
+
+  <div id="map" style="width: 50%; height: 400px;" class="container">
+    <script>
+      handler = Gmaps.build('Google');
+      handler.buildMap({ provider: {}, internal: { id: 'map' }}, function(){
+        // Customize map options here, if needed
+
+        // Add markers to the map
+        <% @beaches.each do |beach| %>
+          marker = handler.addMarker({
+            lat: <%= beach.latitude %>,
+            lng: <%= beach.longitude %>,
+            infowindow: '<%= beach.name %>'
+          });
+        <% end %>
+
+        // Automatically fit the map to show all markers
+        handler.bounds.extendWith(markers);
+        handler.fitMapToBounds();
+      });
+    </script>
+  </div>
 </div>
-
-<%= link_to "New beach", new_beach_path %>
