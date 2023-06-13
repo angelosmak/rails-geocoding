@@ -40,7 +40,7 @@ function initMap() {
   marker.addListener("click", () => {
     infowindow.open(map, marker);
   });
-let nextPageToken = null;
+  let nextPageToken = null;
 
   autocomplete.addListener("place_changed", () => {
     infowindow.close();
@@ -66,7 +66,7 @@ let nextPageToken = null;
       location: place.geometry.location,
       radius: 5000, // Search within a 5000-meter radius
       keyword: "beach",
-      type: ["natural_feature"]
+      type: ["natural_feature"],
     };
 
     service.nearbySearch(request, (results, status) => {
@@ -88,6 +88,16 @@ let nextPageToken = null;
       infowindow.setContent(place.name);
       infowindow.open(map, beachMarker);
     });
+
+    // Retrieve and display photos
+    if (place.photos && place.photos.length > 0) {
+      const photo = place.photos[0];
+      const photoUrl = photo.getUrl({ maxWidth: 400, maxHeight: 400 });
+      const photoHtml = `<img src="${photoUrl}" alt="${place.name}" class="place-photo">`;
+      infowindowContent.innerHTML = photoHtml;
+    } else {
+      infowindowContent.innerHTML = `<div class="no-photo">No photo available</div>`;
+    }
   }
 }
 
