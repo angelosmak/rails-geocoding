@@ -19,10 +19,10 @@ function initMap() {
     center: { lat: -33.8688, lng: 151.2195 },
     zoom: 13,
   });
+
   const input = document.getElementById("pac-input");
-  // Specify just the place data fields that you need.
   const autocomplete = new google.maps.places.Autocomplete(input, {
-    fields: ["place_id", "geometry", "formatted_address", "name"],
+    types: ["geocode"],
   });
 
   autocomplete.bindTo("bounds", map);
@@ -38,12 +38,16 @@ function initMap() {
   marker.addListener("click", () => {
     infowindow.open(map, marker);
   });
+let nextPageToken = null;
+
   autocomplete.addListener("place_changed", () => {
     infowindow.close();
+    marker.setVisible(false);
 
     const place = autocomplete.getPlace();
 
     if (!place.geometry || !place.geometry.location) {
+      window.alert("No details available for input: '" + place.name + "'");
       return;
     }
 
@@ -54,20 +58,36 @@ function initMap() {
       map.setZoom(17);
     }
 
-    // Set the position of the marker using the place ID and location.
-    // @ts-ignore This should be in @typings/googlemaps.
-    marker.setPlace({
-      placeId: place.place_id,
+    const service = new google.maps.places.PlacesService(map);
+
+    const request = {
       location: place.geometry.location,
+      radius: 5000, // Search within a 5000-meter radius
+      keyword: "beach",
+      type: ["natural_feature"]
+    };
+
+    service.nearbySearch(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        for (let i = 0; i < results.length; i++) {
+          createMarker(results[i]);
+        }
+      }
     });
-    marker.setVisible(true);
-    infowindowContent.children.namedItem("place-name").textContent = place.name;
-    infowindowContent.children.namedItem("place-id").textContent =
-      place.place_id;
-    infowindowContent.children.namedItem("place-address").textContent =
-      place.formatted_address;
-    infowindow.open(map, marker);
   });
+
+  function createMarker(place) {
+    const beachMarker = new google.maps.Marker({
+      map: map,
+      position: place.geometry.location,
+    });
+
+    google.maps.event.addListener(beachMarker, "click", () => {
+      infowindow.setContent(place.name);
+      infowindow.open(map, beachMarker);
+    });
+  }
 }
 
 window.initMap = initMap;
+
