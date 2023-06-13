@@ -1,0 +1,17 @@
+<% json_response = JSON.parse(response) %>
+
+<% json_response.each do |place| %>
+  <div>
+    <h3><%= place['name'] %></h3>
+    <p>Address: <%= place['vicinity'] %></p>
+    <p>Rating: <%= place['rating'] %></p>
+    <p>Latitude: <%= place['geometry']['location']['lat'] %></p>
+    <p>Longitude: <%= place['geometry']['location']['lng'] %></p>
+    <% if place['photos'].present? %>
+      <h4>Photos:</h4>
+      <% place['photos'].each do |photo| %>
+        <img src="<%= photo['photo_reference'] %>" alt="Place Photo" />
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
