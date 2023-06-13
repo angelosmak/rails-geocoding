@@ -5,13 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>"></script>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    <script type="module" src="./index.js"></script>
   </head>
   <body>
-    <%= render "shared/flashes" %>
+  <%= render "shared/flashes" %>
   <%= render "shared/navbar" %>
-    <%= yield %>
+  <!--The div element for the map -->
+  <%= yield %>
+    <div style="display: none">
+    <input 
+      id="pac-input"
+      class="controls"
+      type="text"
+      placeholder="Enter a location"
+    />
+  </div>
+  <div id="map"></div>
+  <div id="infowindow-content">
+    <span id="place-name" class="title"></span><br />
+    <strong>Place ID:</strong> <span id="place-id"></span><br />
+    <span id="place-address"></span>
+  </div>
+
+    <!--
+      The `defer` attribute causes the callback to execute after the full HTML
+      document has been parsed. For non-blocking uses, avoiding race conditions,
+      and consistent behavior across browsers, consider loading using Promises.
+      See https://developers.google.com/maps/documentation/javascript/load-maps-js-api
+      for more information.
+      -->
+
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>
+&callback=initMap&libraries=places&v=weekly"
+      defer
+    ></script>
+
   </body>
 </html>
