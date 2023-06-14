@@ -12,31 +12,41 @@ class BeachesController < ApplicationController
   def populate_beaches_from_google_places
     # Search method that the form is sending the query to
     search_query = params[:search_query]
-    url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
-    query = {
-      query: {
-        query: search_query + ' beaches',
-        key: ENV['GOOGLE_MAPS_API_KEY']
+
+    # Search the database for matching beaches
+    @beaches = Beach.where("name ILIKE ?", "%#{search_query}%")
+
+    # If beaches are found in the database, redirect to the beaches listing page
+    if @beaches.present?
+      redirect_to beaches_path, notice: 'Beaches found in the database'
+    else
+      # Fetch beaches from the Google Places API
+      url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
+      query = {
+        query: {
+          query: search_query + ' beaches',
+          key: ENV['GOOGLE_MAPS_API_KEY']
+        }
       }
-    }
-    # Parsing the Json object (translating it to Ruby language)
-    response = HTTParty.get(url, query)
-    results = response.parsed_response['results']
 
-    # and pushing each results attributes into the DB creating a Beach
-    # instance
-    results.each do |result|
-      raise
-      beach = Beach.new(
-        name: result['name'],
-        address: result['formatted_address'],
-        photo_url: result['photos'].first['photo_reference'],
-      )
-      beach.save
+      # Send the API request
+      response = HTTParty.get(url, query)
+      results = response.parsed_response['results']
+
+      # Create new Beach instances and save them to the database
+      results.each do |result|
+        beach = Beach.new(
+          name: result['name'],
+          address: result['formatted_address'],
+          photo_url: result['photos'].first['photo_reference'],
+        )
+        beach.save
+      end
+
+      redirect_to beaches_path, notice: 'Beaches populated successfully'
     end
-
-    redirect_to beaches_path, notice: 'Beaches populated successfully'
   end
+
 
 
   # GET /beaches/1
