@@ -1,38 +1,31 @@
-<div class="container text-center row row row-cols-2">
   <p style="color: green"><%= notice %></p>
 
-  <h1>Beaches</h1>
 
-  <div class=" col-4" id="beaches">
+<%# Form to search text in the Google Places API and return the json with name address and photo %>
+
+
+<%# Display of each Beach instance in a card with a photo and a title and address underneath %>
+<% if @beaches.present? %>
+  <div class="row row-cols-4">
     <% @beaches.each do |beach| %>
-    <div class="card mb-2 mx-5 ">
-      <%= render beach  %>
-      <p>
-        <%= link_to "Show this beach", beach ,class:"btn btn-primary"%>
-      </p>
+      <div class="col-md-3">
+        <div class="card beach-card">
+          <% if beach.photo_url.present? %>
+            <% photo_reference = beach.photo_url %>
+            <% google_maps_api_key = ENV['GOOGLE_MAPS_API_KEY'] %>
+            <% image_url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=#{photo_reference}&key=#{google_maps_api_key}" %>
+            <%= image_tag image_url, class: "card-img-top beach-image" %>
+          <% else %>
+            <!-- Placeholder image if photo_url is not available -->
+            <%= image_tag "broken-beach.jpg", class: "card-img-top beach-image" %>
+          <% end %>
+          <div class="card-body">
+            <h5 class="card-title fw-1"><%= beach.name %></h5>
+            <hr>
+            <p class="card-text"><%= beach.address %></p>
+          </div>
+        </div>
       </div>
     <% end %>
   </div>
-
-  <div id="map" style="width: 50%; height: 400px;" class=" container">
-    <script>
-      handler = Gmaps.build('Google');
-      handler.buildMap({ provider: {}, internal: { id: 'map' }}, function(){
-        // Customize map options here, if needed
-
-        // Add markers to the map
-        <% @beaches.each do |beach| %>
-          marker = handler.addMarker({
-            lat: <%= beach.latitude %>,
-            lng: <%= beach.longitude %>,
-            infowindow: '<%= beach.name %>'
-          });
-        <% end %>
-
-        // Automatically fit the map to show all markers
-        handler.bounds.extendWith(markers);
-        handler.fitMapToBounds();
-      });
-    </script>
-  </div>
-</div>
+<% end %>

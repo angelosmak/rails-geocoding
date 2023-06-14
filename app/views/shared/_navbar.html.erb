@@ -8,12 +8,18 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
+    <%= form_tag beaches_populate_beaches_from_google_places_path, method: :get do %>
+      <%= text_field_tag :search_query, params[:search_query], placeholder: "Search for a beach" %>
+      <%= submit_tag 'Search' %>
+    <% end %>
+
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto">
         <% if user_signed_in? %>
           <li class="nav-item active">
             <%= link_to "Home", "#", class: "nav-link" %>
           </li>
+
           <li class="nav-item">
             <%= link_to "Messages", "#", class: "nav-link" %>
           </li>

@@ -1,4 +1,5 @@
 require 'dotenv/load'
+require 'httparty'
 
 class BeachesController < ApplicationController
   before_action :set_beach, only: %i[ show edit update destroy ]
@@ -6,11 +7,38 @@ class BeachesController < ApplicationController
   # GET /beaches
   def index
     @beaches = Beach.all
-    respond_to do |format|
-      format.html # Render the HTML view (if needed)
-      format.json { render json: @beaches } # Render JSON data
-    end
   end
+
+  def populate_beaches_from_google_places
+    # Search method that the form is sending the query to
+    search_query = params[:search_query]
+    url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
+    query = {
+      query: {
+        query: search_query + ' beaches',
+        key: ENV['GOOGLE_MAPS_API_KEY']
+      }
+    }
+    # Parsing the Json object (translating it to Ruby language)
+    response = HTTParty.get(url, query)
+    results = response.parsed_response['results']
+
+    # and pushing each results attributes into the DB creating a Beach
+    # instance
+    results.each do |result|
+      raise
+      beach = Beach.new(
+        name: result['name'],
+        address: result['formatted_address'],
+        photo_url: result['photos'].first['photo_reference'],
+      )
+      beach.save
+    end
+
+    redirect_to beaches_path, notice: 'Beaches populated successfully'
+  end
+
+
   # GET /beaches/1
   def show
   end

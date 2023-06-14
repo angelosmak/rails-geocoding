@@ -37,12 +37,12 @@
       See https://developers.google.com/maps/documentation/javascript/load-maps-js-api
       for more information.
       -->
-
+    <% if false %>
     <script
       src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>
 &callback=initMap&libraries=places&v=weekly"
       defer
     ></script>
-
+   <% end %>
   </body>
 </html>
