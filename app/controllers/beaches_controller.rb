@@ -6,47 +6,48 @@ class BeachesController < ApplicationController
 
   # GET /beaches
   def index
-    @beaches = Beach.all
-  end
-
-  def populate_beaches_from_google_places
-    # Search method that the form is sending the query to
     search_query = params[:search_query]
 
-    # Search the database for matching beaches
-    @beaches = Beach.where("name ILIKE ?", "%#{search_query}%")
+    if search_query.present?
+      # Search the database for matching beaches
+      @beaches = Beach.where("name ILIKE ?", "%#{search_query}%")
 
-    # If beaches are found in the database, redirect to the beaches listing page
-    if @beaches.present?
-      redirect_to beaches_path, notice: 'Beaches found in the database'
-    else
-      # Fetch beaches from the Google Places API
-      url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
-      query = {
-        query: {
-          query: search_query + ' beaches',
-          key: ENV['GOOGLE_MAPS_API_KEY']
+      if @beaches.present?
+        # Beaches found in the database, show them in the view
+        render :index
+      else
+        # Fetch beaches from the Google Places API
+        url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
+        query = {
+          query: {
+            query: search_query + ' beaches',
+            key: ENV['GOOGLE_MAPS_API_KEY']
+          }
         }
-      }
 
-      # Send the API request
-      response = HTTParty.get(url, query)
-      results = response.parsed_response['results']
+        # Send the API request
+        response = HTTParty.get(url, query)
+        results = response.parsed_response['results']
 
-      # Create new Beach instances and save them to the database
-      results.each do |result|
-        beach = Beach.new(
-          name: result['name'],
-          address: result['formatted_address'],
-          photo_url: result['photos'].first['photo_reference'],
-        )
-        beach.save
+        if results.present?
+          # Create new Beach instances and save them to the database
+          @beaches = results.map do |result|
+            Beach.create(
+              name: result['name'],
+              address: result['formatted_address'],
+              photo_url: result['photos'].first['photo_reference']
+            )
+          end
+
+          redirect_to beaches_path, notice: 'Beaches populated successfully'
+        else
+          redirect_to beaches_path, alert: 'No beaches found'
+        end
       end
-
-      redirect_to beaches_path, notice: 'Beaches populated successfully'
+    else
+      @beaches = Beach.all
     end
   end
-
 
 
   # GET /beaches/1

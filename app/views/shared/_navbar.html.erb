@@ -10,7 +10,7 @@
 
     <%# Form takes query and executes the populate_beaches_from_google_places action
     in beaches controller %>
-    <%= form_tag beaches_populate_beaches_from_google_places_path, method: :get do %>
+    <%= form_tag beaches_path, method: :get do %>
       <%= text_field_tag :search_query, params[:search_query], placeholder: "Search for a beach" %>
       <%= submit_tag 'Search' %>
     <% end %>
