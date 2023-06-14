@@ -299,6 +299,7 @@ DEPENDENCIES
   geocoder
   gmaps4rails
   google_places
+  httparty
   jsbundling-rails
   omniauth-google-oauth2
   pg (~> 1.1)

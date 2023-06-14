@@ -1,31 +1,20 @@
-<div class="container text-center">
+<div class="container text-center row row row-cols-2">
   <p style="color: green"><%= notice %></p>
 
   <h1>Beaches</h1>
 
-  <div  id="beaches">
-  <div class="row row-cols-3 ">
+  <div class=" col-4" id="beaches">
     <% @beaches.each do |beach| %>
-    <div class="card mb-2 mx-5 col-3 justify-content-center">
+    <div class="card mb-2 mx-5 ">
       <%= render beach  %>
       <p>
         <%= link_to "Show this beach", beach ,class:"btn btn-primary"%>
       </p>
       </div>
     <% end %>
-    </div>
   </div>
 
-  <div >
-    <%= form_with url: nearby_beaches_path, method: :get do |form| %>
-      <%= form.text_field :location, placeholder: 'Enter your location' %>
-      <%= form.submit 'Search' %>
-    <% end %>
-  </div>
-
-  <%= link_to "New beach", new_beach_path,class:"btn btn-outline-primary my-3" %>
-
-  <div id="map" style="width: 50%; height: 400px;" class="container">
+  <div id="map" style="width: 50%; height: 400px;" class=" container">
     <script>
       handler = Gmaps.build('Google');
       handler.buildMap({ provider: {}, internal: { id: 'map' }}, function(){
